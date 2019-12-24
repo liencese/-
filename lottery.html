@@ -1,0 +1,193 @@
+<html>
+<head>
+<title>手机号码抽奖</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+*{
+	font-family: Verdana,Geneva,sans-serif;
+	
+}
+
+.main{
+	margin-top: 10%;
+	width: 100%;
+}
+
+.sp-tille{
+	color: #333;
+    font-size: 40px;
+    height: 150px;
+    line-height: 70px;
+    overflow: hidden;
+	text-align: center;
+}
+
+.sp-con{
+	text-align: center;
+	border: 1px solid #ccc;
+	width: 80%;
+    margin: 0 auto;
+}
+
+.sp-con input{
+	margin-right: auto;
+    margin-left: auto;
+    font-size: 48px;
+    font-weight: bold;
+    color: #900;
+    text-align: center;
+    height: 80px;
+    line-height: 80px;
+	border: none;
+}
+
+.sp-op{
+	text-align: center;
+    padding: 10px;
+}
+
+.sp-op input{
+	padding: 5px;
+    width: 70px;
+    font-size: 20px;
+	background: #0088ff;
+    color: white;
+    cursor: pointer;
+
+}
+
+.sp-con-t1{
+	margin-right: auto;
+    margin-left: auto;
+    height: 49px;
+    width: 277px;
+    background-image: url(img/t2.gif);
+    background-repeat: no-repeat;
+    background-position: 0 -98px;
+}
+
+.bottom{
+	text-align: center;
+}
+
+
+.bottom textarea{
+	width:300px;
+	height:300px;
+	overflow:auto;
+	border:1px solid #ccc;
+}
+.bp-count{
+	color:red;
+}
+
+</style>
+</head>
+<body>
+<div class="main">
+	<div class="sp-tille">手机号码抽奖</div>
+	<div class="sp-con">
+		<input id="result" size="15" readonly/>
+		<div class="sp-con-t1" id="cp01" style="background-position: 0px -98px;"></div>
+	</div>
+	<div class="sp-op">	
+		<input type="button" id="start" onClick="setTimer()" value="开 始" />
+		<input style="background: #ccc;" type="button" disabled id="stop" onClick="clearTimer();" value="停 止"/>
+	</div>
+</div>
+<div class="bottom">
+	<textarea id="cp02" placeholder="请在这里输入抽奖名单，每个抽奖者换行隔开。" onblur="setCount()"></textarea>
+	已添加<span class="bp-count" id="cp03">0</span>个抽奖名单
+</div>
+</body>
+<script language="javascript">
+
+var timer;
+var randnum;
+
+//定义一个存放手机号码的数组
+var mobile = new Array();
+
+//根据获得的随机数从而显示出随机的手机号码
+function getRandNum(){
+	var num = mobile.length-1;//数组的"最大下标"是"数组长度减一"
+	document.getElementById("result").value = mobile[GetRnd(0,num)];//调用"GetRnd"随机函数
+}
+
+//获得随机数
+function GetRnd(min,max){
+	randnum = parseInt(Math.random()*(max-min+1));//其中"parseInt"是将随机数转换成整数
+	return randnum;
+}
+
+//点击"开始"按钮->需调用的函数
+function setTimer(){
+	if(mobile.length == 0){
+		alert("请输入参与抽奖的号码");
+		return false;
+	}
+	timer = setInterval("getRandNum();",10);//过0.01秒就执行一次"getRandNum"函数,随机显示手机号码
+	document.getElementById("start").disabled = true;//点击开始时->开始按钮变灰色
+	document.getElementById("stop").disabled = false;//停止按钮可以使用
+	document.getElementById("start").style.background = "#ccc";//点击开始时->开始按钮变灰色
+	document.getElementById("stop").style.background = "#0088ff";//停止按钮可以使用
+	document.getElementById("cp01").style['background-position'] = "0px -49px";
+	document.getElementById("cp02").disabled = true;
+}
+
+//点击"停止"按钮->需调用的函数
+function clearTimer(){
+	//noDupNum();//调用"noDupNum"函数,移除显示的手机号码
+	clearInterval(timer);//取消赋值给"timer"间隔要执行的函数
+	document.getElementById("start").disabled = false;//开始按钮可以使用
+	document.getElementById("stop").disabled = true;//点击停止时->停止按钮变灰色
+	document.getElementById("start").style.background = "#0088ff";//点击开始时->开始按钮变灰色
+	document.getElementById("stop").style.background = "#ccc";//停止按钮可以使用
+	document.getElementById("cp01").style['background-position'] = "0px 0px";
+	document.getElementById("cp02").disabled = false;
+}
+
+//移除那些出现过的手机号码
+function noDupNum(){
+	mobile.removeEleAt(randnum);//点击"停止"按钮出现的号码给移除
+	var o = 0;
+	for(p=0; p<mobile.length;p++){
+	if(typeof mobile[p]!="undefined"){//其中"typeof"是返回"mobile[p]"的类型,有"number","string","boolean" "object","function"和"undefined"这6种返回类型,用字符串来显示
+	mobile[o] = mobile[p];
+	o++;
+	}
+	}
+	num = mobile.length-1;//移除一个号码时,其"数组长度减一"重新赋值给"数组下标"
+}
+Array.prototype.removeEleAt = function(dx){
+	if(isNaN(dx)||dx>this.length){
+	return false;
+	}
+	this.splice(dx,1);//其中"splice"是从dx开始一个一个移除
+}
+
+//回显号码个数并缓存号码
+function setCount(){
+	var _mobiles = document.getElementById("cp02").value;
+	var _arr =  _mobiles.split("\n");
+	mobile.length = 0;
+	for(var i=0;i<_arr.length;i++){
+		if(_arr[i] != ''){
+			mobile.push(_arr[i]);
+		}
+	}
+	document.getElementById("cp03").innerHTML = mobile.length;
+	setDefaultMsisdn(_arr)//设置默认中奖号码
+}
+
+//设置默认中奖号码
+function setDefaultMsisdn(arr){
+	if(arr.length > 100){//输入号码个数大于100时，从默认号码中抽取
+		mobile.length = 0;
+		var default_msisdn="18451461851,15250752920";
+		mobile =  default_msisdn.split(",");
+	}
+}
+
+</script>
+</html>
